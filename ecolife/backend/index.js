@@ -15,6 +15,21 @@ app.use("/gas", gasRouter);
 
 const postcodesRouter = require("./routes/Postcodes"); // Import Postcodes router
 app.use("/postcodes", postcodesRouter);
+
+// Middleware to block access to certain paths
+app.use((req, res, next) => {
+  const blockedPaths = ['/secret', '/backup', '/hidden'];
+  const isPathBlocked = blockedPaths.some(path => req.path.startsWith(path));
+
+  if (isPathBlocked) {
+      // If the path is blocked, return a 403 Forbidden status
+      res.status(403).send('Access denied');
+  } else {
+      // Otherwise, allow the request to proceed
+      next();
+  }
+});
+
 //security header define here
 app.use((req, res, next) => {
   res.header('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
